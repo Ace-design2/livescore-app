@@ -23,7 +23,7 @@ export function Navbar() {
   const [hasScrolled, setHasScrolled] = useState(false);
   
   // Theme state
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   // Search state
@@ -128,10 +128,10 @@ export function Navbar() {
             {/* Dark Mode Toggle */}
             {mounted && (
               <button 
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
                 className="p-2 rounded-full text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               >
-                {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                {resolvedTheme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
               </button>
             )}
             
