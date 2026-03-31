@@ -8,12 +8,25 @@ import { LeagueFilterDropdown } from "@/components/LeagueFilterDropdown";
 import { FixtureSkeleton } from "@/components/FixtureSkeleton";
 
 export default function FixturesPage() {
-  const [selectedDate, setSelectedDate] = useState("All");
+  const [selectedDate, setSelectedDate] = useState("Today");
   const [selectedLeague, setSelectedLeague] = useState("All");
   const [isLoading, setIsLoading] = useState(true);
 
-  // Extract unique options from mock DB (could be derived constants)
-  const availableDates = Array.from(new Set(fixtures.map(f => f.date)));
+  // Sequential Date List
+  const DATE_SEQUENCE = ["Yesterday", "Today", "Tomorrow", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const currentIdx = DATE_SEQUENCE.indexOf(selectedDate);
+  const canGoPrev = currentIdx > 0;
+  const canGoNext = currentIdx < DATE_SEQUENCE.length - 1;
+
+  const handlePrevDate = () => {
+    if (canGoPrev) setSelectedDate(DATE_SEQUENCE[currentIdx - 1]);
+  };
+  
+  const handleNextDate = () => {
+    if (canGoNext) setSelectedDate(DATE_SEQUENCE[currentIdx + 1]);
+  };
+
+  // Extract unique options from mock DB for League Dropdown
   const availableLeagues = Array.from(new Set(fixtures.map(f => f.league)));
 
   // Simulate network
@@ -27,7 +40,7 @@ export default function FixturesPage() {
 
   // Apply filters
   const filteredFixtures = fixtures.filter((match) => {
-    const matchesDate = selectedDate === "All" ? true : match.date === selectedDate;
+    const matchesDate = match.date === selectedDate;
     const matchesLeague = selectedLeague === "All" ? true : match.league === selectedLeague;
     return matchesDate && matchesLeague;
   });
@@ -59,9 +72,11 @@ export default function FixturesPage() {
 
       {/* 2) Date Filter Tabs (Sticky Wrapper) */}
       <DateTabs 
-        dates={availableDates} 
         selectedDate={selectedDate} 
-        onSelectDate={setSelectedDate} 
+        onPrevDate={handlePrevDate} 
+        onNextDate={handleNextDate}
+        canGoPrev={canGoPrev}
+        canGoNext={canGoNext}
       />
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-8">

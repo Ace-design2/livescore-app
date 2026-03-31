@@ -1,39 +1,51 @@
 import React from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface DateTabsProps {
-  dates: string[];
   selectedDate: string;
-  onSelectDate: (date: string) => void;
+  onPrevDate: () => void;
+  onNextDate: () => void;
+  canGoPrev: boolean;
+  canGoNext: boolean;
 }
 
-export function DateTabs({ dates, selectedDate, onSelectDate }: DateTabsProps) {
+export function DateTabs({ selectedDate, onPrevDate, onNextDate, canGoPrev, canGoNext }: DateTabsProps) {
   return (
-    <div className="w-full overflow-x-auto py-3 scrollbar-hide sticky top-16 z-40 bg-gray-50/95 dark:bg-[#0a0a0a]/95 backdrop-blur border-b border-gray-100 dark:border-gray-800">
-      <div className="flex gap-2 px-4 sm:px-0">
-        <button
-          onClick={() => onSelectDate("All")}
-          className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-            selectedDate === "All"
-              ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-sm'
-              : 'bg-white dark:bg-[#1a1a1a] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800'
+    <div className="w-full py-3 sticky top-16 z-40 bg-gray-50/95 dark:bg-[#0a0a0a]/95 backdrop-blur border-b border-gray-100 dark:border-gray-800 flex justify-center items-center">
+      <div className="flex items-center gap-6">
+        
+        <button 
+          onClick={onPrevDate}
+          disabled={!canGoPrev}
+          className={`p-2 rounded-full transition-colors ${
+            canGoPrev 
+              ? 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-800' 
+              : 'text-gray-300 dark:text-gray-700 cursor-not-allowed'
           }`}
+          aria-label="Previous date"
         >
-          All Dates
+          <ChevronLeft size={20} />
         </button>
 
-        {dates.map((date) => (
-          <button
-            key={date}
-            onClick={() => onSelectDate(date)}
-            className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-              selectedDate === date
-                ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-sm'
-                : 'bg-white dark:bg-[#1a1a1a] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800'
-            }`}
-          >
-            {date}
-          </button>
-        ))}
+        <div className="min-w-[120px] text-center">
+          <span className="text-base font-bold text-gray-900 dark:text-white">
+            {selectedDate}
+          </span>
+        </div>
+
+        <button 
+          onClick={onNextDate}
+          disabled={!canGoNext}
+          className={`p-2 rounded-full transition-colors ${
+            canGoNext 
+              ? 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-800' 
+              : 'text-gray-300 dark:text-gray-700 cursor-not-allowed'
+          }`}
+          aria-label="Next date"
+        >
+          <ChevronRight size={20} />
+        </button>
+
       </div>
     </div>
   );
