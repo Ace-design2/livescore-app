@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Search, Moon, Sun, Menu, X } from 'lucide-react';
+import { useTheme } from 'next-themes';
 
 const navLinks = [
   { name: 'Home', path: '/' },
@@ -15,12 +16,23 @@ const navLinks = [
 
 export function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
+  
+  // Theme state
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  // Search state
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
 
   // Handle scroll effect
   useEffect(() => {
+    setMounted(true);
     const handleScroll = () => {
       setHasScrolled(window.scrollY > 10);
     };
@@ -28,24 +40,12 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Handle dark mode (simplified logic using html class)
-  useEffect(() => {
-    // Check initial preference
-    if (document.documentElement.classList.contains('dark')) {
-      setIsDarkMode(true);
-    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setIsDarkMode(true);
-      document.documentElement.classList.add('dark');
-    }
-  }, []);
-
-  const toggleDarkMode = () => {
-    const nextMode = !isDarkMode;
-    setIsDarkMode(nextMode);
-    if (nextMode) {
-      document.documentElement.classList.add('dark');
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/?q=${encodeURIComponent(searchQuery)}`);
     } else {
-      document.documentElement.classList.remove('dark');
+      router.push('/');
     }
   };
 
@@ -58,7 +58,7 @@ export function Navbar() {
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-16 relative">
           
           {/* Logo & Desktop Nav */}
           <div className="flex items-center gap-8">
@@ -90,15 +90,50 @@ export function Navbar() {
 
           {/* Right side actions */}
           <div className="flex items-center gap-2 md:gap-4">
-            <button className="p-2 rounded-full text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-              <Search size={20} />
-            </button>
-            <button 
-              onClick={toggleDarkMode}
-              className="p-2 rounded-full text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            >
-              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
+            
+            {/* Search Input Area */}
+            {isSearchOpen ? (
+              <form onSubmit={handleSearchSubmit} className="flex items-center animate-in fade-in slide-in-from-right-4 duration-200">
+                <input
+                  type="text"
+                  placeholder="Search teams..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  autoFocus
+                  className="w-32 sm:w-48 px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-800 border-none rounded-l-full focus:ring-0 text-gray-900 dark:text-white placeholder-gray-500"
+                />
+                <button 
+                  type="submit" 
+                  className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-r-full transition-colors"
+                >
+                  <Search size={16} />
+                </button>
+                <button 
+                  type="button"
+                  onClick={() => setIsSearchOpen(false)}
+                  className="ml-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                >
+                  <X size={18} />
+                </button>
+              </form>
+            ) : (
+              <button 
+                onClick={() => setIsSearchOpen(true)}
+                className="p-2 rounded-full text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              >
+                <Search size={20} />
+              </button>
+            )}
+
+            {/* Dark Mode Toggle */}
+            {mounted && (
+              <button 
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="p-2 rounded-full text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              >
+                {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+              </button>
+            )}
             
             {/* Mobile menu button */}
             <div className="flex md:hidden">
