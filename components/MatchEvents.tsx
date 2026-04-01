@@ -1,5 +1,7 @@
 import React from 'react';
 import { MatchEvent } from '@/types/match';
+import { FaFutbol } from 'react-icons/fa';
+import { ArrowLeftRight } from 'lucide-react';
 
 interface MatchEventsProps {
   events: MatchEvent[];
@@ -13,13 +15,13 @@ const MatchEvents: React.FC<MatchEventsProps> = ({ events }) => {
   const getEventIcon = (type: string) => {
     switch (type) {
       case 'goal':
-        return <span className="text-lg leading-none" role="img" aria-label="Goal">⚽</span>;
+        return <FaFutbol className="w-5 h-5 text-gray-200" />;
       case 'yellow-card':
-        return <div className="w-3 h-4 bg-yellow-400 rounded-sm shadow-sm" />;
+        return <div className="w-3.5 h-4.5 bg-yellow-400 rounded-[2px] shadow-sm transform -rotate-6 border border-white/20" />;
       case 'red-card':
-        return <div className="w-3 h-4 bg-red-500 rounded-sm shadow-sm" />;
+        return <div className="w-3.5 h-4.5 bg-red-500 rounded-[2px] shadow-sm transform -rotate-6 border border-white/20" />;
       case 'substitution':
-        return <span className="text-lg text-green-500 leading-none">⇄</span>;
+        return <ArrowLeftRight className="w-5 h-5 text-green-500" />;
       default:
         return null;
     }
